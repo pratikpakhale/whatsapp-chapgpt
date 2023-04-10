@@ -50,7 +50,7 @@ app.post('/webhook', async (req, res) => {
   res.type('text/xml').send(twiml.toString())
 })
 
-if (process.env.NODE_ENV === 'productions') {
+if (process.env.NODE_ENV === 'production') {
   // app.listen(port)
   module.exports.handler = serverless(app)
 } else {
