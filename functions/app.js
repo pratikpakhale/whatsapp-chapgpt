@@ -15,7 +15,7 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration)
 
-const history = []
+const history = {}
 
 const app = express()
 
@@ -25,12 +25,16 @@ app.post('/*webhook', async (req, res) => {
   try {
     const message = req.body.Body
 
+    // console.log(req.body)
+
     console.log('message: ' + message)
 
     const messages = []
-    for (const [input_text, completion_text] of history) {
-      messages.push({ role: 'user', content: input_text })
-      messages.push({ role: 'assistant', content: completion_text })
+    if (history['WaId']) {
+      for (const [input_text, completion_text] of history['WaId']) {
+        messages.push({ role: 'user', content: input_text })
+        messages.push({ role: 'assistant', content: completion_text })
+      }
     }
     messages.push({ role: 'user', content: message })
 
@@ -40,7 +44,11 @@ app.post('/*webhook', async (req, res) => {
     })
 
     const completion_text = completion.data.choices[0].message.content
-    history.push([message, completion_text])
+
+    // if history['WaId'] is an array then push or else create an array and push
+    history['WaId']
+      ? history['WaId'].push([message, completion_text])
+      : (history['WaId'] = [[message, completion_text]])
 
     console.log('openai response: ' + completion_text)
 
