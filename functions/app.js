@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: false }))
 app.post('/webhook', async (req, res) => {
   const message = req.body.Body
 
-  console.log(message)
+  console.log('message: ' + message)
 
   const messages = []
   for (const [input_text, completion_text] of history) {
@@ -39,14 +39,12 @@ app.post('/webhook', async (req, res) => {
   })
 
   const completion_text = completion.data.choices[0].message.content
-  console.log(completion_text)
-
-  const twiml = new MessagingResponse()
-
-  twiml.message(completion_text)
-
   history.push([message, completion_text])
 
+  console.log('openai response: ' + completion_text)
+
+  const twiml = new MessagingResponse()
+  twiml.message(completion_text)
   res.type('text/xml').send(twiml.toString())
 })
 
