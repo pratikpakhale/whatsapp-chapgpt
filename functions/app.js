@@ -2,6 +2,7 @@
 
 const express = require('express')
 
+const serverless = require('serverless-http')
 require('dotenv').config()
 
 const { MessagingResponse } = require('twilio').twiml
@@ -49,6 +50,11 @@ app.post('/webhook', async (req, res) => {
   res.type('text/xml').send(twiml.toString())
 })
 
-app.listen(5000, () => {
-  console.log('listening on port 5000')
-})
+if (process.env.NODE_ENV === 'productions') {
+  // app.listen(port)
+  module.exports.handler = serverless(app)
+} else {
+  app.listen(5000, () => {
+    console.log('listening on port 5000')
+  })
+}
