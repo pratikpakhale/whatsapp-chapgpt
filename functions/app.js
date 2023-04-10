@@ -1,4 +1,4 @@
-// express server listening post req on /webhook and print body
+// express server listening post req on /webhook
 
 const express = require('express')
 
