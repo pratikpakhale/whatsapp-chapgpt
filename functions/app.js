@@ -21,31 +21,35 @@ const app = express()
 
 app.use(express.urlencoded({ extended: false }))
 
-app.post('/webhook', async (req, res) => {
-  const message = req.body.Body
+app.post('/*webhook', async (req, res) => {
+  try {
+    const message = req.body.Body
 
-  console.log('message: ' + message)
+    console.log('message: ' + message)
 
-  const messages = []
-  for (const [input_text, completion_text] of history) {
-    messages.push({ role: 'user', content: input_text })
-    messages.push({ role: 'assistant', content: completion_text })
+    const messages = []
+    for (const [input_text, completion_text] of history) {
+      messages.push({ role: 'user', content: input_text })
+      messages.push({ role: 'assistant', content: completion_text })
+    }
+    messages.push({ role: 'user', content: message })
+
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+    })
+
+    const completion_text = completion.data.choices[0].message.content
+    history.push([message, completion_text])
+
+    console.log('openai response: ' + completion_text)
+
+    const twiml = new MessagingResponse()
+    twiml.message(completion_text)
+    res.type('text/xml').send(twiml.toString())
+  } catch (err) {
+    console.log(err.message)
   }
-  messages.push({ role: 'user', content: message })
-
-  const completion = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages: messages,
-  })
-
-  const completion_text = completion.data.choices[0].message.content
-  history.push([message, completion_text])
-
-  console.log('openai response: ' + completion_text)
-
-  const twiml = new MessagingResponse()
-  twiml.message(completion_text)
-  res.type('text/xml').send(twiml.toString())
 })
 
 if (process.env.NODE_ENV === 'production') {
