@@ -7,5 +7,8 @@
     "nodemon": "^2.0.22",
     "openai": "^3.2.1",
     "twilio": "^4.10.0"
+  },
+  "scripts": {
+    "start": "nodemon functions/app.js"
   }
 }
