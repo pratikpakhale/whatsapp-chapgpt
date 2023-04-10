@@ -25,6 +25,13 @@ app.post('/*webhook', async (req, res) => {
   try {
     const message = req.body.Body
 
+    if (message === 'clear') {
+      history['WaId'] = []
+      const twiml = new MessagingResponse()
+      twiml.message('State Cleared Successfully')
+      res.type('text/xml').send(twiml.toString())
+    }
+
     // console.log(req.body)
 
     console.log('message: ' + message)
